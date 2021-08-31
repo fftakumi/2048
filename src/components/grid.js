@@ -87,6 +87,8 @@ const Grid = (props) => {
                     if (packed[row + dir.row][col + dir.col].value === 0) {
                         packed[row + dir.row][col + dir.col].value = packed[row][col].value
                         packed[row][col].value = 0
+                        packed[row][col].destination = [row, col]
+                        packed[row + dir.row][col + dir.col].destination = [row + dir.row, col + dir.col]
                     }
                 }
             }
@@ -101,9 +103,9 @@ const Grid = (props) => {
                 if (!(0 <= row + dir.row && row + dir.row < _ary.length && 0 <= col + dir.col && col + dir.col < _ary[0].length)) {
                     continue
                 }
-                if (_ary[row + dir.row][col + dir.col] === _ary[row][col]) {
-                    _ary[row + dir.row][col + dir.col] += _ary[row][col]
-                    _ary[row][col] = 0
+                if (_ary[row + dir.row][col + dir.col].value === _ary[row][col].value) {
+                    _ary[row + dir.row][col + dir.col].value += _ary[row][col].value
+                    _ary[row][col].value = 0
                 }
             }
         }
