@@ -1,16 +1,23 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef, useCallback} from "react";
 
 const Square = (props) => {
-    const [value, setValue] = useState(props.value)
+    const ref = useRef(null)
     const [pos, setPos] = useState(props.pos)
-
-    useEffect(() => {
-    },[value])
 
     const size = {
         width: 100,
         height: 100
     }
+
+    useEffect(() => {
+        return () => {
+            setPos({
+                row: 0,
+                col: 0
+            })
+            console.log("unmount")
+        }
+    },[])
 
     return (
         <>
@@ -20,11 +27,14 @@ const Square = (props) => {
                 height: size.height,
                 top: size.height * pos.row,
                 left: size.width * pos.col
-            }}>
+            }}
+            ref={ref}
+            id={`row${pos.row}col${pos.col}`}>
                 <div className='value'>
-                    {value}
+                    {props.value}
                 </div>
             </div>
+
         </>
     )
 }

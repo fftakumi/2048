@@ -12,8 +12,7 @@
     padding-top: 3px;
     padding-left: 3px;
     position: absolute;
-    transition: top 0.5s 0s linear;
-    transition: left 0.5s 0s linear;
+    transition: top 0.5s 0s linear, left 0.5s 0s linear;
 }
 
 .value {
