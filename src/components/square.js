@@ -10,13 +10,7 @@ const Square = (props) => {
     }
 
     useEffect(() => {
-        return () => {
-            setPos({
-                row: 0,
-                col: 0
-            })
-            console.log("unmount")
-        }
+
     },[])
 
     return (

@@ -96,67 +96,130 @@ const Grid = (props) => {
         return packed
     }
 
-    const add2 = (ary, dir) => {
-        const _ary = ary.map((value => ([...value])))
+    const up2 = (ary) => {
+        const _ary = ary.map((_, row) => {
+            return _.map((value, col) => {
+                return {destination: [row, col], pre:[row, col], value:value, preValue:value}
+            })
+        })
         for (let row = 0; row < _ary.length; row++) {
-            for (let col = 0; col < _ary.length; col++) {
-                if (!(0 <= row + dir.row && row + dir.row < _ary.length && 0 <= col + dir.col && col + dir.col < _ary[0].length)) {
-                    continue
-                }
-                if (_ary[row + dir.row][col + dir.col].value === _ary[row][col].value) {
-                    _ary[row + dir.row][col + dir.col].value += _ary[row][col].value
-                    _ary[row][col].value = 0
+            for(let col = 0; col < _ary[0].length; col++) {
+                for (let i = 0; i <= row; i++) {
+                    if (row - i > 0) {
+                        if ((_ary[row - i - 1][col].value === 0) || (_ary[row - i][col].value === _ary[row - i - 1][col].value && (_ary[row - i][col].value === _ary[row - i][col].preValue || _ary[row - i][col].preValue === 0) && _ary[row - i - 1][col].value === _ary[row - i - 1][col].preValue)) {
+                            _ary[row - i][col].destination = [row - i - 1, col]
+                            _ary[row - i - 1][col].value += _ary[row - i][col].value
+                            _ary[row - i][col].value = 0
+                        }
+                    }
                 }
             }
         }
         return _ary
     }
 
-    const getDestination = (dir) => {
-        const posAndAddedFlag = values.map((_, row) => {
-            return _.map((__, col) => {
-                return [row, col, false]
-            })
-        })
-        const preAndDest = values.map((_, row) => {
+    const add2 = (ary, dir) => {
+        const _ary = ary.map((_, row) => {
             return _.map((value, col) => {
-                return {destination: [row, col], pre:[row, col], value:value}
+                return {destination: [row, col], pre:[row, col], value:value, preValue:value}
             })
         })
-        return preAndDest
+
+        for (let row = dir.row < 0? 0 : _ary.length - 1;                   //dir.row === -1 => row = 0 dir.row === 1 => row = _ary.length
+             dir.row < 0?  row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
+             dir.row < 0? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
+        ) {
+            console.log(row)
+            for(let col = dir.col < 0? 0 : _ary[0].length - 1;
+                dir.col < 0?  col < _ary[0].length : col >= 0;
+                dir.col < 0? col++ : col--) {
+                for (let i = 0;
+                     dir.row < 0? i < row * Math.abs(dir.row) : i < (_ary.length - row) * Math.abs(dir.row) || dir.col < 0? i < col * Math.abs(dir.col) : i < (_ary[0].length - col) * Math.abs(dir.col);   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
+                     i++) {
+                    if (dir.row < 0? row - dir.row * i > 0 : row + i < _ary.length - 1) {
+                        if ((_ary[row + dir.row * (i + 1)][col].value === 0) || (_ary[row + dir.row * i][col].value === _ary[row + dir.row * (i + 1)][col].value && (_ary[row + dir.row * i][col].value === _ary[row + dir.row * i][col].preValue || _ary[row + dir.row * i][col].preValue === 0) && _ary[row + dir.row * (i + 1)][col].value === _ary[row + dir.row * (i + 1)][col].preValue)) {
+                            _ary[row + dir.row * i][col].destination = [row + dir.row * (i + 1), col]
+                            _ary[row + dir.row * (i + 1)][col].value += _ary[row + dir.row * i][col].value
+                            _ary[row + dir.row * i][col].value = 0
+                        }
+                    }
+                }
+            }
+        }
+        return _ary
     }
 
-    console.log(getDestination())
+    const left2 = (ary) => {
+        const _ary = ary.map((_, row) => {
+            return _.map((value, col) => {
+                return {destination: [row, col], pre:[row, col], value:value, preValue:value}
+            })
+        })
+        for (let row = 0; row < _ary.length; row++) {
+            for(let col = 0; col < _ary[0].length; col++) {
+                for (let i = 0; i <= col; i++) {
+                    if (col - i > 0) {
+                        if ((_ary[row][col - i - 1].value === 0) || (_ary[row][col - i].value === _ary[row][col - i - 1].value && (_ary[row][col - i].value === _ary[row][col - i].preValue || _ary[row][col - i].preValue === 0) && _ary[row][col - i - 1].value === _ary[row][col - i - 1].preValue)) {
+                            _ary[row][col - i].destination = [row, col - i - 1]
+                            _ary[row][col - i - 1].value += _ary[row][col - i].value
+                            _ary[row][col - i].value = 0
+                        }
+                    }
+                }
+            }
+        }
+        return _ary
+    }
+
     const els = useRef([])
 
 
     useEffect(() => {
         const update = (value) => {
-            console.log(value)
             valuesRef.current = value
             setValues(value)
         }
 
         const up = () => {
-            let packed = pack(valuesRef.current, {row: -1, col: 0})
-            let added = add(packed, {row: -1, col: 0})
-            packed = pack(added, {row: -1, col: 0})
+            // let packed = pack(valuesRef.current, {row: -1, col: 0})
+            // let added = add(packed, {row: -1, col: 0})
+            // packed = pack(added, {row: -1, col: 0})
+            // packed = addRandomValue(packed)
+            let packed = add2(valuesRef.current, {row: -1, col: 0})
+            packed = packed.map(_array => {
+                return _array.map(__array => {
+                    return  __array.value
+                })
+            })
             packed = addRandomValue(packed)
             update(packed)
         }
 
         const left = () => {
-            let packed = pack(valuesRef.current, {row: 0, col: -1})
-            let added = add(packed, {row: 0, col: -1})
-            packed = pack(added, {row: 0, col: -1})
+            let packed = left2(valuesRef.current)
+            packed = packed.map(_array => {
+                return _array.map(__array => {
+                    return  __array.value
+                })
+            })
             packed = addRandomValue(packed)
             update(packed)
         }
 
         const down = () => {
-            let packed = pack(valuesRef.current, {row: 1, col: 0})
-            let added = add(packed, {row: 1, col: 0})
-            packed = pack(added, {row: 1, col: 0})
+            // let packed = pack(valuesRef.current, {row: 1, col: 0})
+            // let added = add(packed, {row: 1, col: 0})
+            // packed = pack(added, {row: 1, col: 0})
+            // packed = addRandomValue(packed)
+            // update(packed)
+            let packed = add2(valuesRef.current, {row: 1, col: 0})
+            console.log(packed)
+            packed = packed.map(_array => {
+                return _array.map(__array => {
+                    return  __array.value
+                })
+            })
+
             packed = addRandomValue(packed)
             update(packed)
         }
