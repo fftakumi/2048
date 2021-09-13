@@ -42,31 +42,29 @@ const Grid = (props) => {
     const add = (ary, dir) => {
         const _ary = ary.map((_, row) => {
             return _.map((value, col) => {
-                return {destination: [row, col], pre:[row, col], value:value, preValue:value}
+                return {destination: [row, col], pre: [row, col], value: value, preValue: value}
             })
         })
 
-        for (let row = dir.row < 0? 0 : _ary.length - 1;                   //dir.row === -1 => row = 0 dir.row === 1 => row = _ary.length
-             dir.row < 0?  row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
-             dir.row < 0? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
+        for (let row = dir.row < 0 ? 0 : _ary.length - 1;                   //dir.row === -1 => row = 0 dir.row === 1 => row = _ary.length
+             dir.row < 0 ? row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
+             dir.row < 0 ? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
         ) {
-            for(let col = dir.col < 0? 0 : _ary[0].length - 1;
-                dir.col < 0?  col < _ary[0].length : col >= 0;
-                dir.col < 0? col++ : col--) {
+            for (let col = dir.col < 0 ? 0 : _ary[0].length - 1;
+                 dir.col < 0 ? col < _ary[0].length : col >= 0;
+                 dir.col < 0 ? col++ : col--) {
                 for (let i = 0;
-                     (dir.row < 0? i < row * Math.abs(dir.row) : i < (_ary.length - 1 - row) * Math.abs(dir.row)) ||
-                     (dir.col < 0? i < col * Math.abs(dir.col) : i < (_ary[0].length - 1 - col) * Math.abs(dir.col));   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
+                     (dir.row < 0 ? i < row * Math.abs(dir.row) : i < (_ary.length - 1 - row) * Math.abs(dir.row)) ||
+                     (dir.col < 0 ? i < col * Math.abs(dir.col) : i < (_ary[0].length - 1 - col) * Math.abs(dir.col));   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
                      i++) {
-                    if ((dir.row < 0? row + dir.row * i >= 0 : row - i <= _ary.length - 1) &&
-                        (dir.col < 0? col + dir.col * i >= 0 : col - i <= _ary[0].length - 1)) {
-                        if (
-                            (_ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value === 0) ||
+                    if ((dir.row < 0 ? row + dir.row * i >= 0 : row - i <= _ary.length - 1) &&
+                        (dir.col < 0 ? col + dir.col * i >= 0 : col - i <= _ary[0].length - 1)) {
+                        if ((_ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value === 0) ||
                             (
                                 _ary[row + dir.row * i][col + dir.col * i].value === _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value &&
                                 (_ary[row + dir.row * i][col + dir.col * i].value === _ary[row + dir.row * i][col + dir.col * i].preValue || _ary[row + dir.row * i][col + dir.col * i].preValue === 0) &&
                                 _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value === _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].preValue
-                            )
-                        ) {
+                            )) {
                             _ary[row + dir.row * i][col + dir.col * i].destination = [row + dir.row * (i + 1), col + dir.col * (i + 1)]
                             _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value += _ary[row + dir.row * i][col + dir.col * i].value
                             _ary[row + dir.row * i][col + dir.col * i].value = 0
@@ -83,64 +81,32 @@ const Grid = (props) => {
 
 
     useEffect(() => {
-        const update = (value) => {
-            valuesRef.current = value
-            setValues(value)
+        const update = (dir) => {
+            let packed = add(valuesRef.current, dir)
+            packed = packed.map(_array => {
+                return _array.map(__array => {
+                    return __array.value
+                })
+            })
+            packed = addRandomValue(packed)
+            valuesRef.current = packed
+            setValues(packed)
         }
 
         const up = () => {
-            // let packed = pack(valuesRef.current, {row: -1, col: 0})
-            // let added = add(packed, {row: -1, col: 0})
-            // packed = pack(added, {row: -1, col: 0})
-            // packed = addRandomValue(packed)
-            let packed = add(valuesRef.current, {row: -1, col: 0})
-            packed = packed.map(_array => {
-                return _array.map(__array => {
-                    return  __array.value
-                })
-            })
-            packed = addRandomValue(packed)
-            update(packed)
+            update({row: -1, col: 0})
         }
 
         const left = () => {
-            let packed = add(valuesRef.current, {row: 0, col: -1})
-            packed = packed.map(_array => {
-                return _array.map(__array => {
-                    return  __array.value
-                })
-            })
-            packed = addRandomValue(packed)
-            update(packed)
+            update({row: 0, col: -1})
         }
 
         const down = () => {
-            // let packed = pack(valuesRef.current, {row: 1, col: 0})
-            // let added = add(packed, {row: 1, col: 0})
-            // packed = pack(added, {row: 1, col: 0})
-            // packed = addRandomValue(packed)
-            // update(packed)
-            let packed = add(valuesRef.current, {row: 1, col: 0})
-            packed = packed.map(_array => {
-                return _array.map(__array => {
-                    return  __array.value
-                })
-            })
-
-            packed = addRandomValue(packed)
-            update(packed)
+            update({row: 1, col: 0})
         }
 
         const right = () => {
-            let packed = add(valuesRef.current, {row: 0, col: 1})
-            packed = packed.map(_array => {
-                return _array.map(__array => {
-                    return  __array.value
-                })
-            })
-
-            packed = addRandomValue(packed)
-            update(packed)
+            update({row: 0, col: 1})
         }
 
         const handleKeyDown = (e) => {
@@ -163,6 +129,9 @@ const Grid = (props) => {
 
         window.addEventListener('keydown', handleKeyDown)
 
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
 
     }, [])
 
@@ -178,7 +147,7 @@ const Grid = (props) => {
                             key={`col:${i}row:${j}value:${__value}`}
                             value={__value} pos={{col: j, row: i}}
                             unmountFunc={test}
-                            ref={els.current[i*size.row + j*size.col]}
+                            ref={els.current[i * size.row + j * size.col]}
                         />
                     })
                 })}
