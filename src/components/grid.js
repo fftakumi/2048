@@ -129,12 +129,11 @@ const Grid = (props) => {
              dir.row < 0?  row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
              dir.row < 0? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
         ) {
-            console.log(row)
             for(let col = dir.col < 0? 0 : _ary[0].length - 1;
                 dir.col < 0?  col < _ary[0].length : col >= 0;
                 dir.col < 0? col++ : col--) {
                 for (let i = 0;
-                     dir.row < 0? i < row * Math.abs(dir.row) : i < (_ary.length - row) * Math.abs(dir.row) || dir.col < 0? i < col * Math.abs(dir.col) : i < (_ary[0].length - col) * Math.abs(dir.col);   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
+                     (dir.row < 0? i < row * Math.abs(dir.row) : i < (_ary.length - row) * Math.abs(dir.row)) || (dir.col < 0? i < col * Math.abs(dir.col) : i < (_ary[0].length - col) * Math.abs(dir.col));   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
                      i++) {
                     if (dir.row < 0? row - dir.row * i > 0 : row + i < _ary.length - 1) {
                         if ((_ary[row + dir.row * (i + 1)][col].value === 0) || (_ary[row + dir.row * i][col].value === _ary[row + dir.row * (i + 1)][col].value && (_ary[row + dir.row * i][col].value === _ary[row + dir.row * i][col].preValue || _ary[row + dir.row * i][col].preValue === 0) && _ary[row + dir.row * (i + 1)][col].value === _ary[row + dir.row * (i + 1)][col].preValue)) {
@@ -213,7 +212,6 @@ const Grid = (props) => {
             // packed = addRandomValue(packed)
             // update(packed)
             let packed = add2(valuesRef.current, {row: 1, col: 0})
-            console.log(packed)
             packed = packed.map(_array => {
                 return _array.map(__array => {
                     return  __array.value
