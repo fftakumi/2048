@@ -126,8 +126,7 @@ const Grid = (props) => {
                     break
             }
         }
-
-        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keydown', handleKeyDown, true)
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
@@ -136,7 +135,7 @@ const Grid = (props) => {
     }, [])
 
     const test = () => {
-        console.log("unmount")
+        console.log(values)
     }
     return (
         <>
@@ -147,6 +146,7 @@ const Grid = (props) => {
                             key={`col:${i}row:${j}value:${__value}`}
                             value={__value} pos={{col: j, row: i}}
                             unmountFunc={test}
+                            pos2={{col: 0, row: i}}
                             ref={els.current[i * size.row + j * size.col]}
                         />
                     })
