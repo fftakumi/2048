@@ -50,6 +50,12 @@ const Grid = (props) => {
 
     const add = (ary, dir) => {
         const _ary = ary.concat()
+        _ary.forEach(_value => {
+            _value.forEach(__value => {
+                __value.preValue = __value.value
+            })
+        })
+
         for (let row = dir.row < 0 ? 0 : _ary.length - 1;                   //dir.row === -1 => row = 0 dir.row === 1 => row = _ary.length
              dir.row < 0 ? row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
              dir.row < 0 ? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
@@ -88,6 +94,7 @@ const Grid = (props) => {
         const update = (dir) => {
             let packed = add(valuesRef.current, dir)
             packed = addRandomValue(packed)
+            console.log(packed)
             valuesRef.current = packed
             setValues(packed)
         }
@@ -139,14 +146,14 @@ const Grid = (props) => {
     return (
         <>
             <div className='grid-container'>
-                {values.map((_value, i) => {
-                    return _value.map((__value, j) => {
+                {values.map((_value, row) => {
+                    return _value.map((__value, col) => {
                         return <Square
-                            key={`col:${i}row:${j}value:${__value.value}`}
-                            value={__value.value} pos={{row: i, col: j}}
+                            key={`row:${row}col:${col}value:${__value.value}`}
+                            value={__value.value} pos={{row: row, col: col}}
                             unmountFunc={test}
                             pos2={{row: __value.destination[0], col: __value.destination[1]}}
-                            ref={els.current[i * size.row + j * size.col]}
+                            ref={els.current[row * size.row + col * size.col]}
                         />
                     })
                 })}

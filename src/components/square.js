@@ -10,29 +10,7 @@ const Square = (props) => {
     }
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            // eslint-disable-next-line default-case
-            switch (e.key) {
-                case 'ArrowUp':
-                    props.unmountFunc()
-                    break
-                case 'ArrowLeft':
-                    props.unmountFunc()
-                    break
-                case 'ArrowDown':
-                    props.unmountFunc()
-                    break
-                case 'ArrowRight':
-                    props.unmountFunc()
-                    break
-            }
-        }
-        window.addEventListener('keydown', handleKeyDown, true)
         setPos(props.pos2)
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
 
     },[])
 
