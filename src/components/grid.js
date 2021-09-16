@@ -7,7 +7,7 @@ const Grid = (props) => {
         const zeroIndex = []
         ary.map((_value, i) => {
             _value.map((__value, j) => {
-                if (__value === 0) {
+                if (__value.value === 0) {
                     zeroIndex.push([i, j])
                 }
             })
@@ -16,7 +16,7 @@ const Grid = (props) => {
             return ary
         }
         const randomIndex = zeroIndex[Math.floor(Math.random() * zeroIndex.length)]
-        ary[randomIndex[0]][randomIndex[1]] = 2
+        ary[randomIndex[0]][randomIndex[1]].value = 2
         return ary
     }
     //------------------------
@@ -27,25 +27,29 @@ const Grid = (props) => {
         row: 4
     })
 
-    const initialNum = 2
-    let _array = new Array(size.col)
-    for (let i = 0; i < size.col; i++) {
-        _array[i] = new Array(size.row).fill(0)
-    }
-    for (let i = 0; i < initialNum; i++) {
-        _array = addRandomValue(_array)
+
+
+    const init = (initialNum) => {
+        let _ary = [...Array(size.row)].map(() => Array(size.col).fill(0))
+        for(let row = 0; row < size.row; row++) {
+            for(let col = 0; col < size.col; col++) {
+                _ary[row][col] = {destination: [row, col], pre: [row, col], value: 0, preValue: 0}
+            }
+        }
+        for (let i = 0; i < initialNum; i++) {
+            _ary = addRandomValue(_ary)
+        }
+        return _ary
     }
 
-    const valuesRef = useRef(_array)
-    const [values, setValues] = useState(_array)
+    const array = init(2)
+    const valuesRef = useRef(array)
+    const [values, setValues] = useState(array)
+
+
 
     const add = (ary, dir) => {
-        const _ary = ary.map((_, row) => {
-            return _.map((value, col) => {
-                return {destination: [row, col], pre: [row, col], value: value, preValue: value}
-            })
-        })
-
+        const _ary = ary.concat()
         for (let row = dir.row < 0 ? 0 : _ary.length - 1;                   //dir.row === -1 => row = 0 dir.row === 1 => row = _ary.length
              dir.row < 0 ? row < _ary.length : row >= 0;                //dir.row === -1 => row < length dir.row === 1 => row > 0
              dir.row < 0 ? row++ : row--                                       //dir.row === -1 => row++ dir.row === 1 => row--
@@ -83,11 +87,6 @@ const Grid = (props) => {
     useEffect(() => {
         const update = (dir) => {
             let packed = add(valuesRef.current, dir)
-            packed = packed.map(_array => {
-                return _array.map(__array => {
-                    return __array.value
-                })
-            })
             packed = addRandomValue(packed)
             valuesRef.current = packed
             setValues(packed)
@@ -143,10 +142,10 @@ const Grid = (props) => {
                 {values.map((_value, i) => {
                     return _value.map((__value, j) => {
                         return <Square
-                            key={`col:${i}row:${j}value:${__value}`}
-                            value={__value} pos={{col: j, row: i}}
+                            key={`col:${i}row:${j}value:${__value.value}`}
+                            value={__value.value} pos={{row: i, col: j}}
                             unmountFunc={test}
-                            pos2={{col: 0, row: i}}
+                            pos2={{row: __value.destination[0], col: __value.destination[1]}}
                             ref={els.current[i * size.row + j * size.col]}
                         />
                     })
