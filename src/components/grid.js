@@ -28,11 +28,10 @@ const Grid = (props) => {
     })
 
 
-
     const init = (initialNum) => {
         let _ary = [...Array(size.row)].map(() => Array(size.col).fill(0))
-        for(let row = 0; row < size.row; row++) {
-            for(let col = 0; col < size.col; col++) {
+        for (let row = 0; row < size.row; row++) {
+            for (let col = 0; col < size.col; col++) {
                 _ary[row][col] = {destination: [row, col], pre: [row, col], value: 0, preValue: 0}
             }
         }
@@ -47,12 +46,12 @@ const Grid = (props) => {
     const [values, setValues] = useState(array)
 
 
-
     const add = (ary, dir) => {
         const _ary = ary.concat()
         _ary.forEach(_value => {
             _value.forEach(__value => {
                 __value.preValue = __value.value
+                __value.destination = __value.pre
             })
         })
 
@@ -67,17 +66,21 @@ const Grid = (props) => {
                      (dir.row < 0 ? i < row * Math.abs(dir.row) : i < (_ary.length - 1 - row) * Math.abs(dir.row)) ||
                      (dir.col < 0 ? i < col * Math.abs(dir.col) : i < (_ary[0].length - 1 - col) * Math.abs(dir.col));   //dir.row === -1 => i <= row dir.row === 1 => i <= _ary.length - row
                      i++) {
-                    if ((dir.row < 0 ? row + dir.row * i >= 0 : row - i <= _ary.length - 1) &&
-                        (dir.col < 0 ? col + dir.col * i >= 0 : col - i <= _ary[0].length - 1)) {
-                        if ((_ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value === 0) ||
+                    let ahead_row = row + dir.row * (i + 1)
+                    let ahead_col = col + dir.col * (i + 1)
+                    let now_row = row + dir.row * i
+                    let now_col = col + dir.col * i
+                    if ((dir.row < 0 ? now_row >= 0 : row - i <= _ary.length - 1) &&
+                        (dir.col < 0 ? now_col >= 0 : col - i <= _ary[0].length - 1)) { //indexからはみ出ないように
+                        if ((_ary[ahead_row][ahead_col].value === 0) ||
                             (
-                                _ary[row + dir.row * i][col + dir.col * i].value === _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value &&
-                                (_ary[row + dir.row * i][col + dir.col * i].value === _ary[row + dir.row * i][col + dir.col * i].preValue || _ary[row + dir.row * i][col + dir.col * i].preValue === 0) &&
-                                _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value === _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].preValue
+                                _ary[now_row][now_col].value === _ary[ahead_row][ahead_col].value &&
+                                (_ary[now_row][now_col].value === _ary[now_row][now_col].preValue || _ary[now_row][now_col].preValue === 0) &&
+                                _ary[ahead_row][ahead_col].value === _ary[ahead_row][ahead_col].preValue
                             )) {
-                            _ary[row + dir.row * i][col + dir.col * i].destination = [row + dir.row * (i + 1), col + dir.col * (i + 1)]
-                            _ary[row + dir.row * (i + 1)][col + dir.col * (i + 1)].value += _ary[row + dir.row * i][col + dir.col * i].value
-                            _ary[row + dir.row * i][col + dir.col * i].value = 0
+                            _ary[row][col].destination = [ahead_row, ahead_col]
+                            _ary[ahead_row][ahead_col].value += _ary[now_row][now_col].value
+                            _ary[now_row][now_col].value = 0
                         }
                     }
                 }
@@ -140,23 +143,28 @@ const Grid = (props) => {
 
     }, [])
 
-    const test = () => {
-        console.log(values)
-    }
     return (
         <>
-            <div className='grid-container'>
-                {values.map((_value, row) => {
-                    return _value.map((__value, col) => {
-                        return <Square
-                            key={`row:${row}col:${col}value:${__value.value}`}
-                            value={__value.value} pos={{row: row, col: col}}
-                            unmountFunc={test}
-                            pos2={{row: __value.destination[0], col: __value.destination[1]}}
-                            ref={els.current[row * size.row + col * size.col]}
-                        />
-                    })
-                })}
+            <div className="background">
+                <div className='grid-container'>
+                    {values.map((_value, row) => {
+                        return _value.map((__value, col) => {
+                            if (__value.value !== 0 || __value.preValue !== 0) {
+                                return (
+                                    <Square
+                                        key={`${__value.value},${__value.preValue},${__value.destination},${__value.pre}`}
+                                        value={__value.value}
+                                        preValue={__value.preValue}
+                                        pos={{row: row, col: col}}
+                                        pos2={{row: __value.destination[0], col: __value.destination[1]}}
+                                        ref={els.current[row * size.row + col * size.col]}
+                                    />)
+                            } else {
+                                return <></>
+                            }
+                        })
+                    })}
+                </div>
             </div>
         </>
     )

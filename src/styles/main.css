@@ -7,17 +7,25 @@
 
 .square {
     background-color: #e5406e;
+    border-radius: 5px;
     width: auto;
     height: auto;
-    padding-top: 3px;
-    padding-left: 3px;
+    padding: 3px;
     position: absolute;
-    transition: top 0.5s 0s linear, left 0.5s 0s linear;
+    transition: top 0.5s 0s linear, left 0.5s 0s linear, width 0.2s 0s linear, height 0.2s 0s linear;
 }
 
 .value {
     width: auto;
+    height: 100%;
     text-align: center;
     background-color: #fabaf2;
     border-radius: 3px;
+}
+
+.background {
+    margin: 0 auto;
+    width: 400px;
+    height: 400px;
+    background-color: #005ec7;
 }
